@@ -110,6 +110,17 @@ for a firmware it does not cover.
 
 GPL-3.0. See [LICENSE](LICENSE).
 
+## Not affiliated
+
+This is an independent, unofficial project. It is **not affiliated with,
+endorsed by, or supported by** ZENGGE, Magic Home, or any lighting installer or
+manufacturer. Product and company names are used only to describe which hardware
+this library is compatible with. All trademarks belong to their respective
+owners.
+
+Use at your own risk. Writing to a device's timer slots or configuration changes
+persistent state on your hardware.
+
 ---
 
 <details>
