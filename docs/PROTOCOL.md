@@ -107,6 +107,11 @@ The reply is a **28-byte `EA 81` frame**, not the classic 14-byte state:
 
 `a1` = colour write mode, `b1` = white. Saturation `0` renders white.
 
+✅ **Confirmed by eye against real hardware, 2026-08-16** — driven from a HomeKit
+colour picker, with a human watching the strand change. Note this command ends
+whatever scene was running, and there is no command to restore it: the scene has
+to be re-selected in the vendor app.
+
 ### Scene / animation — wrapped, version `0x02`
 
     e1 21 00 <bri> <id> <style> 01 <?> <speed> 00*6 <n> then n x 5-byte entries
