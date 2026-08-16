@@ -138,6 +138,14 @@ class Controller:
         self.send(p.solid_color(hue, saturation, value))
         self.read(settle=1.0)
 
+    def white(self, temperature: int = 50, brightness: int = 100) -> None:
+        """Drive the dedicated white channel. Both values 0-100.
+
+        UNVERIFIED against hardware -- see :func:`zengge.protocol.white`.
+        """
+        self.send(p.white(temperature, brightness))
+        self.read(settle=1.0)
+
     def scene(self, pattern: int, colors: Sequence[Color], speed: int = 50,
               brightness: int = 100, style: int = 0x00,
               param7: int = 0x64) -> None:

@@ -126,6 +126,24 @@ def solid_color(hue: int, saturation: int, value: int) -> bytes:
                   0x00, 0x00, 0x00, 0x00, 0x14, 0x00, 0x00])
 
 
+def white(temperature: int, brightness: int) -> bytes:
+    """Inner message for the dedicated WHITE channel.
+
+    ``temperature`` and ``brightness`` are 0-100. Byte 3 selects white mode
+    (``0xB1``) rather than colour (``0xA1``), and the value rides in the two
+    bytes that a colour write leaves as white temp / white brightness.
+
+    ⚠️ UNVERIFIED against hardware. The byte positions come from captured
+    traffic, but the SCALE is an assumption: 0 is believed to be the warmest
+    and 100 the coolest, and the Kelvin range those correspond to is unknown.
+    Do not present a Kelvin figure to a user as if it were measured.
+    """
+    return bytes([0xE0, 0x01, 0x00, WRITE_MODE_WHITE,
+                  0x00, 0x00, 0x00,
+                  temperature & 0xFF, brightness & 0xFF,
+                  0x00, 0x00, 0x14, 0x00, 0x00])
+
+
 class Color(NamedTuple):
     hue: int = 0            # 0-358
     saturation: int = 100   # 0-100; 0 renders white
