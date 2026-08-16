@@ -1,0 +1,72 @@
+# zengge-ledenet-py
+
+A Python library for **ZENGGE / LEDENET LED controllers running the newer OEM
+firmware** (model `0x6E`, `ZG-BL-HONGRUI`, 2025 builds) that existing libraries
+cannot talk to. Licensed **GPL-3.0**.
+
+**`docs/PROTOCOL.md` is the authoritative reference** and the most valuable
+thing in this repo. It is complete — read it before writing any protocol code.
+
+## Status
+
+Protocol fully reverse-engineered and verified against real hardware. The
+library itself is being built; the protocol document came first deliberately, so
+the knowledge is durable independent of the code.
+
+## ⛔ This repository is PUBLIC — never commit anything identifying
+
+The work originated on one person's home network. **None of that may appear
+here.** Before every commit, check for:
+
+- MAC addresses, IP addresses, hostnames
+- The 32-hex discovery token (it is device-specific and of unknown purpose —
+  treat it as a credential)
+- Any specific house layout: pixel counts, zone boundaries, room names
+- Anyone's saved scenes, palettes, or schedules
+- The name of the lighting installer or any other real business
+
+**Everything must be generic and configurable**: pixel count, zone definitions,
+device address, scene definitions. If an example needs a number, it is a
+parameter with a neutral default, not someone's real value.
+
+## Design constraints (learned the hard way — do not "fix" these)
+
+- **There is no backpressure.** The socket accepts frames far faster than the
+  device renders them, and reports total success while the lights stutter or
+  freeze. Any API that streams frames **must** pace deliberately, and must not
+  infer a render rate from its own send loop. See PROTOCOL.md.
+- **Pace to ≤5 Hz for per-pixel writes.** 8 Hz visibly stutters.
+- **One persistent connection.** Rapid reconnects stall the controller for about
+  a minute, and produce false "unsupported" conclusions.
+- **Use ≥5 s timeouts.** These are 2.4 GHz devices and slow to accept.
+- **Inner messages carry no checksum**; the wrapper's checksum covers all.
+- **`e1 21` entries are 5 bytes and tile as a repeating motif; `e1 23` entries
+  are 7 bytes and are true per-pixel.** Confusing them produces output that
+  parses fine and looks wrong.
+
+## Verification rule
+
+**A state byte moving is not proof the lights did anything**, and the reverse is
+also true — a command can render visibly while moving no state bytes. During
+development, three separate measurements looked clean in code and were wrong in
+reality. Anything claiming to change light output needs a human to look at it
+before it is documented as working.
+
+## Legal posture
+
+- Reverse engineering for interoperability; **no protection measure was
+  circumvented** — the protocol is plaintext on a local network.
+- `flux_led` (LGPL-3.0-or-later) was read to decode the state frame and is
+  credited. **No code was copied.** Do not vendor or paste its source.
+- Do not use vendor trademarks in the project name or imply endorsement.
+  Factual compatibility statements only.
+- `tools/` contains a device impersonator for protocol discovery. It must stay
+  framed as a research/interop tool for use on your own network with your own
+  hardware.
+
+## Layout
+
+    zengge/          the library
+    docs/PROTOCOL.md the protocol reference — authoritative
+    tools/           device impersonator for capturing an unknown firmware's commands
+    examples/        runnable examples, fully parameterised
