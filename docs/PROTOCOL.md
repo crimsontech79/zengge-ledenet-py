@@ -222,7 +222,7 @@ Measured by eye with red/blue alternation (a deliberately harsh test):
 > moved.** Pace your output; you cannot measure the render rate from your own
 > send loop.
 
-Numbers above are for a ~180-pixel strand (1276-byte frames). **The ceiling is
+Numbers above are for a ~180-pixel strand (frames of roughly 1.3 kB). **The ceiling is
 expected to scale with frame size**, so shorter strands should sustain more —
 but that is *inferred, not measured*, and is a good first contribution if you
 have a different pixel count.
@@ -243,6 +243,24 @@ with ~15 s spacing before believing it.**
 
 Separately, the controller **closes an idle connection about every 3 minutes**.
 That is normal; reconnect and carry on.
+
+### Poll, do not wait for pushes
+
+The controller has been seen sending state frames unprompted, but **it does not
+do so dependably**. A purely passive listener received nothing across 18 minutes
+and several connections (2026-08-16, real hardware) — long enough for a client
+built on that assumption to look permanently broken, reporting whatever defaults
+it started with.
+
+**Query it.** Send the bare state query on the connection you already hold, at
+whatever interval you need. Reads are free; it is reconnecting that hurts, and
+the two are easy to conflate:
+
+    one connection, polled every 30 s      ✅ fine
+    a new connection per query             ⛔ stalls the device for a minute
+
+Both framings of the query work, but the bare `81 8a 8b 96` form is the one with
+the most mileage on real hardware.
 
 ---
 

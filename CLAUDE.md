@@ -40,6 +40,10 @@ parameter with a neutral default, not someone's real value.
   a minute, and produce false "unsupported" conclusions.
 - **Use ≥5 s timeouts.** These are 2.4 GHz devices and slow to accept.
 - **Inner messages carry no checksum**; the wrapper's checksum covers all.
+  ⚠️ **Known exception under investigation:** the `e0 05` timer builders emit
+  one, and PROTOCOL.md's timer section documents a trailing `<ck>` without
+  saying whether the message is bare or wrapped. Do **not** "fix" this either
+  way until a capture settles it — see the pending golden fixture.
 - **`e1 21` entries are 5 bytes and tile as a repeating motif; `e1 23` entries
   are 7 bytes and are true per-pixel.** Confusing them produces output that
   parses fine and looks wrong.
@@ -51,6 +55,43 @@ also true — a command can render visibly while moving no state bytes. During
 development, three separate measurements looked clean in code and were wrong in
 reality. Anything claiming to change light output needs a human to look at it
 before it is documented as working.
+
+## Tests
+
+    python3 -m unittest discover -s tests -t .
+
+Standard library only — no pytest, no dev dependencies. Tests must run on a
+fresh clone with **no device, no network and no captures**, so anything needing
+hardware belongs behind an explicit opt-in, never in the default run.
+
+- **`tests/test_protocol.py`** — structural: message layout, field offsets,
+  entry widths, parser edge cases. Guards the shape.
+- **`tests/test_golden.py`** + `tests/golden/captures.json` — byte-exactness
+  against frames captured from the vendor app. Guards the *facts*. Pending
+  entries are marked `TODO` and skip cleanly.
+
+### ⛔ A golden capture is evidence, never an expected value
+
+If a golden test fails, **the builder is wrong**. Editing `capture_hex` to make
+a test pass silently destroys the only durable record of what the device
+actually said — and it will look like a green suite. Never do it. The same goes
+for deleting a failing capture or marking it `TODO` again.
+
+### Do not invent protocol facts
+
+PROTOCOL.md and `DISCOVERY.md` mark what is unverified, and those markers are
+load-bearing. Do not resolve an open question by guessing, by reasoning from the
+classic Magic Home command set (deduction from it failed completely here), or by
+inferring from `flux_led`. An unknown byte stays named as unknown until a
+capture or a human looking at the lights settles it. Tests that pin unsettled
+behaviour belong in the `OpenQuestions` class, which says so explicitly.
+
+### Fixtures must be neutral
+
+Captures embed whatever was on screen: a timer's bytes *are* someone's schedule,
+a scene's entries *are* their palette. Create a throwaway timer or scene in the
+app purely to capture it. Never paste in a real one, and never capture discovery
+traffic — it carries the IP, MAC and the 32-hex token.
 
 ## Legal posture
 
@@ -68,5 +109,6 @@ before it is documented as working.
 
     zengge/          the library
     docs/PROTOCOL.md the protocol reference — authoritative
+    tests/           structural tests + golden captures (stdlib unittest)
     tools/           device impersonator for capturing an unknown firmware's commands
     examples/        runnable examples, fully parameterised

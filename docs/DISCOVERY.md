@@ -92,7 +92,7 @@ Contributions very welcome, especially from anyone with different hardware.
 |---|---|---|
 | state frame | `[2]` | seen as `0x01` and `0x02` with the lights off both times; differs between wrapped and unwrapped replies |
 | state frame | `[14]`, `[15]` | pattern parameters; correlate with static vs animated but only one static sample was available |
-| `e1 21` | byte 7 | usually `0x64`, observed `0x4A` on one scene |
+| `e1 21` | byte 7 | meaning unknown, but it VARIES: `0x64` on five captured scenes, `0x4A` on a sixth. Must be carried through from the capture -- hardcoding `0x64` reproduces that scene wrongly while still being accepted |
 | colour entry | 4th byte | always `0x00` in every capture |
 | colour entry | 5th byte | looks like a white channel; `0x64` on a warm-white scene, `0x00` on colour scenes |
 | discovery | 4th field | 32 hex chars, stable, purpose unknown. No command needs it |
@@ -116,4 +116,4 @@ in app traffic, partially understood at best.
   Plausible, since audio-driven brightness is more forgiving than hard colour
   alternation, but untested.
 - **Maximum entry counts** for `e1 21` motifs and `e1 23` per-pixel writes.
-  181 per-pixel entries work; the upper bound is unknown.
+  A full ~180-pixel strand works; the upper bound is unknown.

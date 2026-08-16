@@ -134,19 +134,25 @@ class Color(NamedTuple):
 
 
 def scene(pattern: int, colors: Sequence[Color], speed: int = 50,
-          brightness: int = 100, style: int = 0x00) -> bytes:
+          brightness: int = 100, style: int = 0x00,
+          param7: int = 0x64) -> bytes:
     """Inner message for an animated scene.
 
     ``colors`` is a REPEATING MOTIF, not per-pixel data: three entries repeat
     around the whole strand. Repeat an entry to lengthen its run -- four reds
     followed by four blues gives blocks of four.
 
+    ``param7`` is byte 7, whose meaning is unknown. It reads ``0x64`` on most
+    scenes but a captured 6-colour scene used ``0x4A``, so it cannot be
+    hardcoded: doing so reproduces that scene incorrectly while still
+    producing a message the device accepts. Pass the captured value through.
+
     Use :func:`per_pixel` when you need to address lights individually.
     """
     if not colors:
         raise ValueError("a scene needs at least one colour")
     head = bytes([0xE1, 0x21, 0x00, brightness & 0xFF, pattern & 0xFF,
-                  style & 0xFF, 0x01, 0x64, speed & 0xFF,
+                  style & 0xFF, 0x01, param7 & 0xFF, speed & 0xFF,
                   0, 0, 0, 0, 0, 0, len(colors)])
     body = b"".join(bytes([c.hue // 2, c.saturation, c.value, 0x00, c.white])
                     for c in colors)

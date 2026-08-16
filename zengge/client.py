@@ -139,9 +139,10 @@ class Controller:
         self.read(settle=1.0)
 
     def scene(self, pattern: int, colors: Sequence[Color], speed: int = 50,
-              brightness: int = 100, style: int = 0x00) -> None:
+              brightness: int = 100, style: int = 0x00,
+              param7: int = 0x64) -> None:
         """Run an animated scene. ``colors`` is a repeating motif, not per-pixel."""
-        self.send(p.scene(pattern, colors, speed, brightness, style))
+        self.send(p.scene(pattern, colors, speed, brightness, style, param7))
         self.read(settle=1.0)
 
     def set_pixels(self, colors: Sequence[Color], brightness: int = 100,
