@@ -19,6 +19,17 @@ commands to a machine that logged them. `tools/fakedevice.py` does this:
 Then exercise each feature in the app. Every capture is a command, verbatim,
 including palettes and timings that could not have been guessed.
 
+> **This method is not original here.** `flux_led` ships
+> [`examples/mockdevice.py`](https://github.com/lightinglibs/flux_led/blob/master/examples/mockdevice.py)
+> for exactly this purpose, and its principal author recommended the approach —
+> mock a device, let the vendor app try to control it, and watch what it sends —
+> in [home-assistant/core#116493](https://github.com/home-assistant/core/issues/116493)
+> back in May 2024. `tools/fakedevice.py` was written independently and shares
+> no code, but the technique is theirs and the credit belongs to them.
+>
+> What this project adds is having actually done it for this firmware, and
+> written the result down.
+
 ### The reads you must answer
 
 Discovered by watching the app hang, one screen at a time:
@@ -85,6 +96,31 @@ exist.
 ## Open questions
 
 Contributions very welcome, especially from anyone with different hardware.
+
+### Which other firmware speaks this command set
+
+The unit examined here reports `6E_40_20250709_ZG-BL-HONGRUI` to `AT+LVER`.
+Public bug reports show other controllers failing protocol detection with
+firmware strings from what looks like the same OEM family:
+
+| Firmware string | Reported in |
+|---|---|
+| `WF.52.B6.26.0,V9_ZG-BL-UFO` | [flux_led#402](https://github.com/lightinglibs/flux_led/issues/402) |
+| `WF.52.AA.35.0,V9_ZG-BL-3KEY` | [home-assistant/core#116493](https://github.com/home-assistant/core/issues/116493) |
+| `WF.50.3D.13.0,V1_ZG-BK2` | [home-assistant/core#116493](https://github.com/home-assistant/core/issues/116493) |
+
+⚠️ **This is a pattern in names, not evidence of compatibility.** Nobody has
+tested whether a `ZG-BL-UFO` or `ZG-BL-3KEY` unit answers the commands
+documented here, and a shared prefix guarantees nothing — the model byte and
+the capability set may both differ. Treat the table as a list of leads for
+anyone who owns one, not as a support claim.
+
+The cheap first test on unknown hardware is entirely read-only: send
+`HF-A11ASSISTHREAD` on UDP 48899 for the model string, send `AT+LVER` for the
+firmware, then send the bare state query `81 8a 8b 96` on TCP 5577 and see
+whether the reply is a 28-byte `EA 81` frame. If it is, the layout in
+`PROTOCOL.md` is worth trying. If it is a classic 14-byte state, use `flux_led`
+instead — it already handles that far better than this does.
 
 ### Unidentified bytes
 
