@@ -271,7 +271,7 @@ the most mileage on real hardware.
 
 ## Why `flux_led` fails
 
-[`flux_led`](https://github.com/Danielhiversen/flux_led) is the established
+[`flux_led`](https://github.com/lightinglibs/flux_led) is the established
 library for Magic Home / LEDENET devices and is excellent for the hardware it
 covers. It cannot talk to this firmware:
 

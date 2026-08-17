@@ -100,7 +100,7 @@ deduction from the classic protocol failed completely; the app simply told us.
 
 ## Credits
 
-[`flux_led`](https://github.com/Danielhiversen/flux_led) (LGPL-3.0-or-later) is
+[`flux_led`](https://github.com/lightinglibs/flux_led) (LGPL-3.0-or-later) is
 the established library for Magic Home / LEDENET devices and is excellent for
 the hardware it supports. Reading its source made decoding the state frame far
 quicker. **No code was copied from it**; this is an independent implementation
