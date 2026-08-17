@@ -36,19 +36,35 @@ So this is written down now, so nobody else has to spend a night finding it.
 
 ## What works
 
-| Capability | Notes |
-|---|---|
-| Power on / off | |
-| Read full state | 28-byte `EA 81` frame, fully decoded |
-| **Scenes / animations** | palette, speed, brightness, animation style |
-| **Per-pixel control** | every pixel individually addressable |
-| **Independent zones** | animate part of a run while the rest stays static |
-| **Music / reactive** | stream an audio level; the device renders it |
-| Device clock | read and write |
-| **On-device timers** | schedules that run with no computer involved |
+| Capability | Verified? | Notes |
+|---|---|---|
+| Power on / off | ✅ watched | |
+| Read full state | ✅ watched | 28-byte `EA 81` frame, fully decoded; reported scene matched reality |
+| **Solid colour** | ✅ watched | driven from a HomeKit colour picker |
+| **Scenes / animations** | ✅ watched | palette, speed, brightness, animation style; replay is byte-exact |
+| **Per-pixel control** | ✅ watched | every pixel individually addressable |
+| **Independent zones** | ✅ watched | animate part of a run while the rest stays static |
+| White / colour temp | ⚠️ partly | the lights respond, but the scale direction and Kelvin range are assumptions |
+| Device clock — read | ✅ | the controller has a working RTC |
+| Device clock — write | ⚠️ decoded | format captured, never sent |
+| **Music / reactive** | ⚠️ decoded | captured from the app; never driven from this library |
+| **On-device timers** | ⛔ decoded | **not verified, and persistent** — see below |
 
-The last one matters most: schedules live **on the controller**, so they fire
-whether or not the machine that wrote them is awake.
+"✅ watched" means a human looked at the lights, not that a byte moved. That
+distinction has been wrong in both directions here, so it is the only standard
+this project trusts.
+
+⛔ **Timers are the one thing here that can leave a mess.** Timer slots are the
+only *persistent* configuration this library writes: a colour or scene lasts
+until the next command, a timer slot survives power cycles and keeps firing.
+There is also an unresolved contradiction in the format — `PROTOCOL.md` says
+inner messages carry no checksum and that adding one makes the device silently
+ignore the message, yet the captured timer format carries one. Nobody has
+settled which is right on real hardware, because doing so means writing to a
+real slot.
+
+If you use them, learn the format against `tools/` first, know how to clear a
+slot before you write one, and check the result in the vendor app.
 
 ## Install
 

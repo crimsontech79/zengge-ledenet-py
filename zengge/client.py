@@ -214,6 +214,24 @@ class Controller:
         These run on the device, so they fire whether or not this machine is
         awake. The payload is a full command -- see ``PAYLOAD_POWER_ON`` /
         ``PAYLOAD_POWER_OFF`` in :mod:`zengge.protocol`, or pass a scene.
+
+        ⛔ **NOT VERIFIED AGAINST REAL HARDWARE, AND NOT REVERSIBLE THE WAY
+        EVERYTHING ELSE HERE IS.**
+
+        Timer slots are the only PERSISTENT configuration this library writes.
+        A colour or a scene lasts until the next command; a timer slot survives
+        power cycles and keeps firing.
+
+        Worse, there is an unresolved contradiction in the format. PROTOCOL.md
+        states that inner messages carry no checksum of their own and that
+        adding one makes the device accept the message and silently do nothing
+        -- yet the captured timer format documents a trailing checksum, and the
+        builders here emit one. Nobody has confirmed which is correct on real
+        hardware, because doing so means writing to a real slot.
+
+        If you use this, learn the format against ``tools/fakedevice.py``
+        first, know how to clear a slot before you write one, and check the
+        result in the vendor app afterwards.
         """
         self._commit_bracket()
         self.send(p.timer_write(slot, hour, minute, payload, enabled, daymask))
@@ -221,6 +239,7 @@ class Controller:
         self._commit_bracket()
 
     def clear_timer(self, slot: int) -> None:
+        """Clear a timer slot. See the warning on :meth:`set_timer`."""
         self._commit_bracket()
         self.send(p.timer_delete(slot))
         self.read(settle=1.0)
