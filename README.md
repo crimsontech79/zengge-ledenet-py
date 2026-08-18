@@ -114,6 +114,33 @@ deduction from the classic protocol failed completely; the app simply told us.
 > **Use only on your own network, with your own hardware.** It is a research and
 > interoperability tool.
 
+## A note on security
+
+These controllers have **no authentication of any kind**. TCP 5577 accepts
+commands from anything that can reach it: no pairing, no key, no challenge, no
+rate limit. That is why this library needs no credentials and works with the
+internet down — and it is worth being clear that the same property is what makes
+it possible at all.
+
+The practical consequence: **anything on your local network can control these
+lights**, including anything a guest, a compromised device, or an untrusted IoT
+gadget brings onto it. For most people that is an acceptable risk for outdoor
+lighting. It is worth knowing rather than discovering.
+
+Two things follow, and both are already true of this code:
+
+- **Reads are free, writes are not.** Querying state changes nothing. The one
+  genuinely persistent write is a timer slot — see the warning above.
+- **The discovery reply's fourth field is treated as a secret.** Newer firmware
+  returns 32 stable hex characters whose purpose is unknown and which no command
+  here uses. It is never logged or stored, on the grounds that if it turns out
+  to be a device key, publishing yours would matter, and if it is meaningless,
+  redacting it costs nothing.
+
+Nothing here circumvents a protection measure, because there is no protection
+measure to circumvent. The protocol is plaintext on a local network, and this is
+documented for interoperability.
+
 ## Credits
 
 [`flux_led`](https://github.com/lightinglibs/flux_led) (LGPL-3.0-or-later) is
