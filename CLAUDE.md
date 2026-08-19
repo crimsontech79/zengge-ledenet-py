@@ -23,7 +23,15 @@ here.** Before every commit, check for:
   treat it as a credential)
 - Any specific house layout: pixel counts, zone boundaries, room names
 - Anyone's saved scenes, palettes, or schedules
-- The name of the lighting installer or any other real business
+- Any claim that a named installer installed *this* system
+
+  ⚠️ **Naming installer brands as compatible hardware IS allowed** — decided
+  2026-08-18. `README.md` lists several installer brands as examples of who
+  resells this controller. That is a factual compatibility statement, and it is
+  the phrasing affected users actually search for. A list of resellers implies
+  nothing about any particular household. **Do not "fix" this by deleting the
+  names**, and do not add a reason here that narrows it — no region, no metro,
+  no "ours is the local one".
 
 **Everything must be generic and configurable**: pixel count, zone definitions,
 device address, scene definitions. If an example needs a number, it is a
