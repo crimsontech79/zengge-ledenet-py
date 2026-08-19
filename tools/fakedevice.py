@@ -44,7 +44,12 @@ DEFAULT_TOKEN = "0" * 32          # newer firmware sends a 4th discovery field
 
 # --- canned replies -------------------------------------------------------
 # Best practice: replace these with bytes read from YOUR real controller.
-STATE = bytes.fromhex("ea8101006e0b23256632f0b1644e00640500b5ffffffff0100000324")
+#
+# The scene id at [8] and the pixel count at [18] are deliberately NEUTRAL
+# placeholders (0x01 and 100), not values read off a real installation — a
+# scene id plus a pixel count together describe somebody's actual lighting.
+# Keep them generic if you edit this frame.
+STATE = bytes.fromhex("ea8101006e0b23250132f0b1644e0064050064ffffffff0100000324")
 
 EMPTY_SLOTS = ["01000000000000", "02000000000000", "03000000000000",
                "04000000000000", "05000000000000", "06000000000000"]
